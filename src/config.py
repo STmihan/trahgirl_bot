@@ -11,8 +11,8 @@ TO_QUERY = [
     "эротические",
 ]
 
-RATE_LIMIT_DAY = os.getenv("RATE_LIMIT_DAY")
-RATE_LIMIT_GLOBAL = os.getenv("RATE_LIMIT_GLOBAL")
+RATE_LIMIT_DAY = int(os.getenv("RATE_LIMIT_DAY"))
+RATE_LIMIT_GLOBAL = int(os.getenv("RATE_LIMIT_GLOBAL"))
 
 
 YANDEX_SERVICE_ACC_ID = os.getenv("YANDEX_SERVICE_ACC_ID")
