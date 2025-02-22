@@ -3,16 +3,9 @@ import random
 from telegram import Update
 from telegram.ext import ContextTypes, ApplicationBuilder, MessageHandler
 
-from src.config import BOT_TOKEN
+from src.config import BOT_TOKEN, TO_QUERY
+from src.rate_limits import check_and_update_rate_limit
 from src.services.image_service import get_random_image_url, download_image
-
-TO_QUERY = [
-    "анимешные",
-    "сексуальные",
-    "девушки",
-    "арт",
-    "эротические",
-]
 
 
 def request_image(retries=5):
@@ -30,15 +23,22 @@ def request_image(retries=5):
 
 
 async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.effective_user.id
+
+    error_message = check_and_update_rate_limit(user_id)
+    if error_message:
+        await context.bot.send_message(update.message.chat_id, error_message)
+        return
+
     path = request_image()
     if path is not None:
         await context.bot.send_photo(update.message.chat_id, photo=open(path, "rb"))
     else:
-        await context.bot.send_message(update.message.chat_id, "Failed to fetch image")
+        await context.bot.send_message(update.message.chat_id, "Ошибка при загрузке изображения.")
 
 
 def start_bot():
-    print("Starting bot: https://t.me/trahgirl_bot")
+    print("Starting bot")
     app = (ApplicationBuilder()
            .token(BOT_TOKEN)
            .build())
